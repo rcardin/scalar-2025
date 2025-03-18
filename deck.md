@@ -99,9 +99,24 @@ When a side effect is _tracked_ and _controlled_ we call it an **effect**
     - The `drunkFlip` deals with _non-determinism_ and _errors_
   2. We must separe the _description_ from making it happen
     - We want a _recipe_ of the program.
-    - **Deferred execution**
+    - **Deferred execution** & **referential transparency**
 
 The pattern lets us use the **substitution model** again 🚀 🎉
+
+---
+
+# An Effect Example
+
+Effects have the form of a generic type `F[A]`
+
+* The `Option[A]` type that models the possibility of a value not being there
+
+```scala 3
+val maybeInt: Option[Int] = Some(42)
+val maybeString: Option[String] = maybeInt.map(_.toString)
+```
+* Composing function returning effects is not trivial
+  * `F[_]` must be a _monad_ so we can use `flatMap` and `map`
 
 ---
 
@@ -114,6 +129,53 @@ An **Effect System** is the implementation of the _Effect Pattern_
 * It provides structures to manage effects
 
 In an effect system, a side effect 👎 becomes an effect 👍
+
+---
+
+# Cats Effect
+
+* Cats Effect uses the `IO[A]` data type to model effects
+  * `IO[A]` is a _über effect_ that models any effectful computation that returns a value of type `A` and can fail with a `Throwable`
+  * It's a _monad_ so we must use `flatMap` and `map` to compose effectful functions
+  * `IO[A]` is **referentially transparent** and **lazy** 
+  * Gives access to the effectul part of the Standard Library
+  * Implements _structured concurrency_
+
+---
+
+# Cats Effect
+
+Let's rewrite the `drunkFlip` function using `IO` effect
+
+```scala 3
+def drunkFlip: IO[String] =
+  for {
+    random <- Random.scalaUtilRandom[IO]
+    caught <- random.nextBoolean
+    heads <-
+      if (caught) random.nextBoolean
+      else IO.raiseError(RuntimeException("We dropped the coin"))
+  } yield if (heads) "Heads" else "Tails"
+```
+The `drunkFlip` function returns a _recipe_ of the program
+
+---
+
+# Cats Effect
+
+The library provides many ways to _run_ the effect
+
+```scala 3
+object Main extends IOApp.Simple {
+  def run: IO[Unit] = drunkFlip.flatMap(result => IO.println(result))
+}
+```
+There are also some _unsafe_ methods to run the effect
+
+```scala 3
+val result: String = drunkFlip.unsafeRunSync()
+val resultF: Future[String] = drunkFlip.unsafeToFuture()
+```
 
 ---
 
