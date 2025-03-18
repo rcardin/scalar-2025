@@ -54,6 +54,8 @@ def timesTwo(i: Int): Int = plusOne(plusOne(i))
 > Model a coin toss, but with a twist: the gambler might be too drunk and lose the coin
 
 ```scala 3
+import scala.util.Random
+
 def drunkFlip(): String = {
   val caught = Random.nextBoolean()
   val heads =
