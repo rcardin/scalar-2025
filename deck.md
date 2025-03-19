@@ -111,7 +111,7 @@ The pattern lets us use the **substitution model** again 🚀 🎉
 
 Effects have the form of a generic type `F[A]`
 
-* The `Option[A]` type that models the possibility of a value not being there
+* The `Option[A]` type models the conditional lack of a value 
 
 ```scala 3
 val maybeInt: Option[Int] = Some(42)
@@ -119,6 +119,7 @@ val maybeString: Option[String] = maybeInt.map(_.toString)
 ```
 * Composing function returning effects is not trivial
   * `F[_]` must be a _monad_ so we can use `flatMap` and `map`
+  * Different monads are _hard to compose_ (Monad Transformers)
 
 ---
 
@@ -178,6 +179,27 @@ There are also some _unsafe_ methods to run the effect
 val result: String = drunkFlip.unsafeRunSync()
 val resultF: Future[String] = drunkFlip.unsafeToFuture()
 ```
+---
+
+# Cats Effect
+
+The `IO[A]` hides the exactly performed side effects. We can make them explicit using _Tagless Final_ syntax
+
+```scala 3
+def drunkFlipF[F[_]: Random: [G[_]] =>> MonadError[G, String]]: F[String] =
+  for {
+    caught <- Random[F].nextBoolean
+    heads <-
+      if (caught) Random[F].nextBoolean
+      else ApplicativeError[F, String].raiseError("We dropped the coin")
+  } yield if (heads) "Heads" else "Tails"
+```
+The cognitive load is higher, here 😱
+
+___
+
+# ZIO
+
 
 ---
 
