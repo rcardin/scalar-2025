@@ -49,7 +49,7 @@ def timesTwo(i: Int): Int = plusOne(plusOne(i))
 * We call these functions *pure* functions
 ---
 
-# We Live in an Imperfect World
+# We Live in an Imperfect World 💔
 
 > Model a coin toss, but with a twist: the gambler might be too drunk and lose the coin
 
@@ -67,7 +67,7 @@ def drunkFlip(): String = {
 
 ---
 
-# We Live in an Imperfect World
+# We Live in an Imperfect World 💔
 
 * We can't use the substitution model for all programs
   * If the `drunkFlip` function throws an _exception_, the substitution model breaks
@@ -289,6 +289,64 @@ val partialResult: Result[String, String] < IO = Abort.run { drunkFlip }
 
 * Virtually, we can define a our own effect handler without changing original recipe
   * For example, for testing purposes
+---
+
+# Make Your Own Effects System 🛠️
+
+* All the effect systems we've seen are based on _monads_ properties to _compose effectful functions_
+  * They use _for-comprehension_ style to give an imperative flavor to a sequence of `flatMap` and `map` calls
+
+What if we could create an effect system that _doesn't rely on monads_, but almost preserves _referential transparency_?
+
+# 😱 😱 😱 😱 😱 😱 😱 😱 😱 😱 😱 😱 😱 
+
+---
+
+# Model the Effects' Algebra 🛠️
+
+We'll focus on the `drunkFlip` example. We need effects that model non-determinism (`Random`), errors (`Raise`), and output (`Output`)
+
+```scala 3
+trait Random {
+  def nextBoolean: Boolean // <- Algebra of the effect
+}
+trait Raise[-E] { // <- `E` represents the error type
+  def raise(error: => E): Nothing
+}
+trait Output {
+  def printLn(line: String): Unit
+}
+```
+
+---
+
+# Wrap Std Library in the Effects
+
+We need now to wrap the standard library with the effects
+
+```scala 3
+object Random {
+  private val unsafe = new Random {
+    override def nextBoolean: Boolean = scala.util.Random.nextBoolean()
+  }
+}
+```
+We call the variable `unsafe` ☣️ because it gives _direct_, _uncontrolled_ access to the side effect 
+
+___
+
+# Wrap Std Library in the Effects
+
+We want to give tracked access to the side effect. Let's add some functions (a DSL) to our `object Random`
+
+```scala 3
+object Random {
+    def nextBoolean(using r: Random): Boolean = r.nextBoolean
+}
+```
+
+To generate a `Boolean`, we need to _provide_ an instance of the `Random` effect. We can call it a **capability**
+
 ---
 
 # References
