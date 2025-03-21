@@ -320,7 +320,7 @@ trait Output {
 
 ---
 
-# Wrap Std Library in the Effects
+# Access Std Library as an Effect
 
 We need now to wrap the standard library with the effects
 
@@ -335,7 +335,7 @@ We call the variable `unsafe` ☣️ because it gives _direct_, _uncontrolled_ a
 
 ___
 
-# Wrap Std Library in the Effects
+# Access Std Library as an Effect
 
 We want to give tracked access to the side effect. Let's add some functions (a DSL) to our `object Random`
 
@@ -345,7 +345,61 @@ object Random {
 }
 ```
 
-To generate a `Boolean`, we need to _provide_ an instance of the `Random` effect. We can call it a **capability**
+To generate a random `Boolean`, we need to _provide_ an instance of the `Random` effect. We can call it a **capability**
+* Calling `Random.nextBoolean` produces a _recipe_ of the program
+
+---
+
+# Access Std Library as an Effect
+
+Let's do the same for the `Ouptut` effect. We'll implement the `Raise[E]` effect later
+
+```scala 3
+object Output {
+  def printLn(line: String)(using o: Output): Unit = o.printLn(line)
+  val unsafe = new Output {
+    override def printLn(line: String): Unit = Console.println(line)
+  }
+}
+```
+
+_Trivia_: The Scala `Console.println` object _doesn't throw any exceptions_ in case of errors 🤷‍♂️
+
+---
+
+# Wrap It All Together
+
+We have now all th bricks to build the `drunkFlip` function again 🙌
+
+```scala 3
+def drunkFlip(using Random, Raise[String]): String = {
+    val caught = Random.nextBoolean
+    val heads  = 
+      if (caught) Random.nextBoolean 
+      else Raise.raise("We dropped the coin")
+    if (heads) "Heads" else "Tails"
+  }
+```
+
+Is it magic? Variables `caught` and `heads` are treated as `Boolean`?! 🤯
+
+---
+
+# Welcome Context Functions 👋
+
+* Scala 3 introduces **Context Functions**, fancy anonymous functions with only _implicit context parameters_
+
+```scala 3
+val program: (Raise[String], Random) ?=> String = drunkFlip
+```
+
+* Treated as **values** in contexts with the same implicit parameters
+
+```scala 3
+def drunkFlip(using Random, Raise[String]): String = {
+  val caught: Boolean = Random.nextBoolean // 🤯
+  // Omissis
+```
 
 ---
 
@@ -356,4 +410,10 @@ To generate a `Boolean`, we need to _provide_ an instance of the `Random` effect
 * [Zionomicon](https://www.zionomicon.com/), John A. De Goes, Adam Fraser, Milad Khajavi
 * [Effekt: Capability-passing style for type- and effect-safe, extensible effect handlers in Scala](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/effekt-capabilitypassing-style-for-type-and-effectsafe-extensible-effect-handlers-in-scala/A19680B18FB74AD95F8D83BC4B097D4F), Jonathan Brachthäuser , Philipp Schuster, Klaus Ostermann
 * [Kyo](https://getkyo.io/)
+
+---
+
+# References
+
+* [Scala 3 Context Functions](https://docs.scala-lang.org/scala3/reference/contextual/context-functions.html)
 
