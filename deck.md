@@ -472,6 +472,37 @@ object Output {
 
 ---
 
+# Handle the Effects
+
+* We can run all the effects of the `drunkFlip` function _stacking_ the handlers
+  * We should do it at the _boundaries_ of the system
+
+```scala 3
+val result: Either[String, String] = Random.run { 
+  Raise.either { 
+    drunkFlip 
+  } 
+}
+```
+...and we're done 🎉
+
+---
+
+# Properties of the Effect System
+
+* We can say this Effect System uses a **Capability Passing Style**
+* It implements the _Effect Pattern_
+  * The type tells us the used _effects_ and the type of the _result_
+  * The execution is _deferred_
+
+```scala 3
+type Effect[E, A] = E ?=> A
+```
+
+* If we handle effects at the _boundaries_ of the system, we can use the **substitution model** again 🚀
+
+---
+
 # References
 
 * [Essential Effects](https://essentialeffects.dev/), Adam Rosien
