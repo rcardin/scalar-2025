@@ -3,7 +3,7 @@ theme: gaia
 _class: lead
 paginate: true
 backgroundColor: #888
-backgroundImage: url('./assets/background.jpg')
+backgroundImage: url('./assets/background.jpeg')
 author: Riccardo Cardin
 lang: en
 color: #063970
@@ -18,7 +18,7 @@ marp: true
   }
 </style>
 
-![bg left:40% 80%](./assets/logo.png)
+![bg right:40% 80%](./assets/logo.png)
 
 # Yo Dawg, Heard You Want To FlatMap Your Direct-Style
 Effect system in Scala using capability passing style 
@@ -394,11 +394,80 @@ val program: (Raise[String], Random) ?=> String = drunkFlip
 ```
 
 * Treated as **values** in contexts with the same implicit parameters
+  * However, they are _recipes_ to obtain the result
 
 ```scala 3
 def drunkFlip(using Random, Raise[String]): String = {
   val caught: Boolean = Random.nextBoolean // 🤯
+```
+
+---
+
+# Handle the Effects
+
+* Handlers are the structures that effectively _run_ effectful functions
+
+```scala 3
+object Raise {
+  def raise[E](error: => E)(using r: Raise[E]): Nothing = r.raise(error)
+  def run[E, A](program: Raise[E] ?=> A): E | A =
+    boundary {
+      given r: Raise[E] = new Raise[E] {
+        override def raise(error: => E): Nothing = break(error)
+      }
+      program
+    }
+}
+```
+
+---
+
+# Handle the Effects
+
+* The Handler for the `Raise[E]` effect provides the `given` instance of the context parameter
+  * We used the `boundary` and `break` functions to _control_ the effect
+
+```scala 3
+val program: Random ?=> String = Raise.run { drunkFlip }
+```
+
+* The `Raise.run` handler _runs_ the `Raise` effect, leaving the `Random` effect _untouched_ 🥷
+  * It's _curryfication_, but on a context parameters level
+---
+
+# Handle the Effects
+
+* Changing the handler changes the _behavior_ of the program
+  * We can handle a `Raise[E] ?=> A` as an `Either[E, A]`
+
+```scala 3
+object Raise {
+  def either[E, A](program: Raise[E] ?=> A): Either[E, A] =
+    boundary {
+      given r: Raise[E] = new Raise[E] {
+        override def raise(error: => E): Nothing = break(Left(error))
+      }
+      Right(program)
+    }
+}
+```
+
+---
+
+# Handle the Effects
+
+Implementing the `Output` and `Random` handlers is quite easy
+
+```scala 3
+object Random {
+  def run[A](program: Random ?=> A): A = program(using Random.unsafe)
   // Omissis
+}
+
+object Output {
+  def run[A](program: Output ?=> A): A = program(using Output.unsafe)
+  // Omissis
+}
 ```
 
 ---
@@ -409,11 +478,11 @@ def drunkFlip(using Random, Raise[String]): String = {
 * [Effect Oriented Programming](https://effectorientedprogramming.com/), Bill Frasure, Bruce Eckel, James Ward
 * [Zionomicon](https://www.zionomicon.com/), John A. De Goes, Adam Fraser, Milad Khajavi
 * [Effekt: Capability-passing style for type- and effect-safe, extensible effect handlers in Scala](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/effekt-capabilitypassing-style-for-type-and-effectsafe-extensible-effect-handlers-in-scala/A19680B18FB74AD95F8D83BC4B097D4F), Jonathan Brachthäuser , Philipp Schuster, Klaus Ostermann
-* [Kyo](https://getkyo.io/)
 
 ---
 
 # References
 
+* [Kyo](https://getkyo.io/)
 * [Scala 3 Context Functions](https://docs.scala-lang.org/scala3/reference/contextual/context-functions.html)
 
