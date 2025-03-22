@@ -499,7 +499,44 @@ val result: Either[String, String] = Random.run {
 type Effect[E, A] = E ?=> A
 ```
 
-* If we handle effects at the _boundaries_ of the system, we can use the **substitution model** again 🚀
+* Handling effects at the _boundaries_ of the system, we can use the **substitution model** again* 🚀
+
+---
+
+# Bonus Track
+
+What if we can define `flatMap` and `map` in our Effect System 🤓?
+
+We need to play some tricks. Let's define a class sorrounding an effect and implement the `flatMap` and `map` function on it
+
+```scala 3
+final class Effect[F](val unsafe: F)
+object Effect {
+  extension [F, A](eff: Effect[F] ?=> A) {
+    inline def flatMap[B](inline f: A => Effect[F] ?=> B): Effect[F] ?=> B = f(eff)
+    inline def map[B](inline f: A => B): Effect[F] ?=> B = eff.flatMap(a => f(a))
+  }
+}
+```
+
+---
+
+# Bonus Track
+
+We need to refactor the effects and the handlers accordingly.
+
+```scala 3
+object Random {
+
+  def nextBoolean(using r: Effect[Random]): Boolean = r.unsafe.nextBoolean
+
+  def run[A](program: Effect[Random] ?=> A): A = program(using unsafe)
+
+  val unsafe = new Effect(new Random {
+    override def nextBoolean: Boolean = scala.util.Random.nextBoolean()
+  })
+}
+```
 
 ---
 
