@@ -20,6 +20,9 @@ marp: true
 
 ![bg right:40% 80%](./assets/logo.png)
 
+<!-- _paginate: false -->
+<!-- _footer: "" -->
+
 # Yo Dawg, Heard You Want To FlatMap Your Direct-Style
 Effect system in Scala using capability passing style 
 
@@ -403,6 +406,25 @@ def drunkFlip(using Random, Raise[String]): String = {
 
 ---
 
+# Welcome Context Functions 👋
+
+Behind the scenes, the Scala compiler rewrites the context function using a _surrogate type, not visible to the user_
+
+```scala 3
+trait ContextFunctionN[-T1, ..., -TN, +R]:
+  def apply(using x1: T1, ..., xN: TN): R
+```
+
+Our `program` is rewritten as:
+
+```scala 3
+val program: new ContextFunction2[Raise[String], Random, String] {
+  def apply(using Raise[String], Random): String = drunkFlip
+}
+```
+
+---
+
 # Handle the Effects
 
 * Handlers are the structures that effectively _run_ effectful functions
@@ -523,11 +545,10 @@ object Effect {
 
 # Bonus Track
 
-We need to refactor the effects and the handlers accordingly.
+We need to refactor the effects and the handlers accordingly (the refactor of the `Raise[E]` effect is omitted)
 
 ```scala 3
 object Random {
-
   def nextBoolean(using r: Effect[Random]): Boolean = r.unsafe.nextBoolean
 
   def run[A](program: Effect[Random] ?=> A): A = program(using unsafe)
@@ -537,6 +558,42 @@ object Random {
   })
 }
 ```
+
+---
+
+# Bonus Track
+
+We can rewrite the `drunkFlip` function using the new DSL:
+
+```scala 3
+def drunkFlip: (Effect[Random], Effect[Raise[String]]) ?=> String = for {
+  caught <- Random.nextBoolean
+  heads <-
+    if (caught) Random.nextBoolean
+    else Raise.raise("We dropped the coin")
+} yield if (heads) "Heads" else "Tails"
+```
+
+If we substitute `inline` functions, we return to the version of `drunkFlip` that doesn't use the `Effect` class 🪄✨
+
+---
+
+# Conclusions
+
+* We defined what is a _side effect_ and why we don't like it
+* We introduced the _Effect Pattern_ and the _Effect Systems_ to manage side effects in a controlled way
+* We explored the _Cats Effect_ and _ZIO_ libraries as examples of _über effects_
+* We introduced the _Kyo_ library as an example of _Algebraic Effects_
+* We built our own _Effect System_ on top of _Context Functions_
+* We saw how we can still define `flatMap` and `map` in our _Effect System_
+
+---
+
+<!-- _class: lead -->
+
+# So Long, and
+# Thanks for All the Fish!
+# 👋
 
 ---
 
@@ -551,6 +608,7 @@ object Random {
 
 # References
 
-* [Kyo](https://getkyo.io/)
+* [Kyo](https://getkyo.io/), Streamlined Algebraic Effects, Simplified Functional Programming, Peak Scala Performance
 * [Scala 3 Context Functions](https://docs.scala-lang.org/scala3/reference/contextual/context-functions.html)
+* [YÆS, Yet Another Effect System](https://github.com/rcardin/yaes), An experimental effect system in Scala using capability passing style 
 
