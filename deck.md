@@ -3,7 +3,7 @@ theme: gaia
 _class: lead
 paginate: true
 backgroundColor: #888
-backgroundImage: url('./assets/background.jpeg')
+backgroundImage: url('./assets/unicorn.jpg')
 author: Riccardo Cardin
 lang: en
 color: #063970
