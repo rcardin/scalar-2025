@@ -31,6 +31,11 @@ Effect system in Scala using capability passing style
 # Agenda
 
 * Who Am I?
+* Effects and Side Effects
+* Scala Monadic Effect Systems
+* Effect Systems and Scala 3 Context Functions
+* Adding Monadic Operations to the Effect System
+* Conclusions
 * References
 
 ---
