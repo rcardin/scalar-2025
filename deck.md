@@ -525,6 +525,42 @@ type Effect[E, A] = E ?=> A
 
 ---
 
+# Where's my `IO` Effect?
+
+* Sometimes bad things happen. _Unpredictable_ errors are thrown
+* We want to execute an effectful function in a _dedicated process_
+
+```scala 3
+trait IO {}// Maybe Deferred would be a better name
+
+object IO {
+  def apply[A](program: => A): IO ?=> A = program
+  def runBlocking[A](program: IO ?=> A): Try[A] = {
+    val es: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
+    Try { es.submit(() => program(using new IO {})).get() }
+  }
+}
+```
+
+---
+
+# Where's my `IO` Effect?
+
+* We can use Java Virtual Threads
+  * Virtual Threads are implemented using _continuations_
+  * They represent _fibers_ 🧶, or _green threads_ on the JVM
+  * From Java 24, they are safe also for `synchronized` blocks 🎉
+  * They support _structured concurrency_ 🤝
+
+```scala 3
+val program: IO ?=> Int = IO {
+  42  / 0
+}
+val result: Try[Int] = IO.runBlocking { program }
+```
+
+---
+
 # Bonus Track
 
 What if we can define `flatMap` and `map` in our Effect System 🤓?
@@ -592,7 +628,7 @@ If we substitute `inline` functions, we return to the version of `drunkFlip` tha
 <!-- _class: lead -->
 
 # So Long, and
-# Thanks for All the Fish!
+# Thanks for All the Fish 🐠!
 # 👋
 
 ---
