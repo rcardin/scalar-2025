@@ -42,6 +42,10 @@ Effect system in Scala using capability passing style
 
 # Who Am I?
 
+* Hello there 👋, I'm **Riccardo Cardin**
+
+![w:300 h:300](./assets/github-qr.jpeg) ![w:300 h:300](./assets/linkedin-qr.jpeg)
+
 ---
 
 # Why We ❤️ Functional Programming
