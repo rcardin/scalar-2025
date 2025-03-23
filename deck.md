@@ -646,5 +646,6 @@ If we substitute `inline` functions, we return to the version of `drunkFlip` tha
 
 * [Kyo](https://getkyo.io/), Streamlined Algebraic Effects, Simplified Functional Programming, Peak Scala Performance
 * [Scala 3 Context Functions](https://docs.scala-lang.org/scala3/reference/contextual/context-functions.html)
+* [The Ultimate Guide to Java Virtual Threads](https://rockthejvm.com/articles/the-ultimate-guide-to-java-virtual-threads)
 * [YÆS, Yet Another Effect System](https://github.com/rcardin/yaes), An experimental effect system in Scala using capability passing style 
 
