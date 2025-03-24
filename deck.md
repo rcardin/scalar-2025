@@ -23,8 +23,8 @@ marp: true
 <!-- _paginate: false -->
 <!-- _footer: "" -->
 
-# Yo Dawg, Heard You Want To FlatMap Your Direct-Style
-Effect system in Scala using capability passing style 
+# Yo Dawg, Heard You Want to Flatmap Your Direct-style
+Effect System in Scala Using Capability Passing Style
 
 ---
 
@@ -549,7 +549,7 @@ type Effect[E, A] = E ?=> A
 
 ---
 
-# Where's my `IO` Effect?
+# Where's My `IO` Effect?
 
 * Sometimes bad things happen. _Unpredictable_ errors are thrown
 * We want to execute an effectful function in a _dedicated process_
@@ -568,7 +568,7 @@ object IO {
 
 ---
 
-# Where's my `IO` Effect?
+# Where's My `IO` Effect?
 
 * We can use Java Virtual Threads
   * Virtual Threads are implemented using _continuations_
