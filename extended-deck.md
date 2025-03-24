@@ -408,7 +408,7 @@ def drunkFlip(using Random, Raise[String]): String = {
   }
 ```
 
-Is it magic? Variables `caught` and `heads` are treated as `Boolean`?! 🤯
+Is it magic 🪄? Variables `caught` and `heads` are treated as `Boolean`?! 🤯
 
 ---
 
