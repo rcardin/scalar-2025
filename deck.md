@@ -7,7 +7,7 @@ backgroundImage: url('./assets/unicorn.jpg')
 author: Riccardo Cardin
 lang: en
 color: #063970
-footer: "Riccardo Cardin - 2025"
+footer: "Riccardo Cardin - Scalar 2025"
 
 marp: true
 ---
@@ -30,22 +30,26 @@ Effect system in Scala using capability passing style
 
 # Agenda
 
-* Who Am I?
-* Effects and Side Effects
-* Scala Monadic Effect Systems
-* Effect Systems and Scala 3 Context Functions
-* Adding Monadic Operations to the Effect System
-* Conclusions
-* References
+* 👋 Who Am I?
+* ❤️ Effects and 💔 Side Effects
+* 🍱 Scala Monadic Effect Systems
+* 🛠️ Build Your Own Effects System
+* ➕ Adding Monadic Operations
+* 🏁 Conclusions and References
 
 ---
 
 # Who Am I?
 
 * Hello there 👋, I'm **Riccardo Cardin**, 
-  * A Scala Enthusiastic Engineer
+  * An Enthusiastic Scala Lover 💯
 
-![w:300 h:300](./assets/github-qr.jpeg) ![w:300 h:300](./assets/linkedin-qr.jpeg)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![w:300 h:300](./assets/github-qr.jpeg)&nbsp;&nbsp;&nbsp;&nbsp;![w:300 h:300](./assets/linkedin-qr.jpeg)&nbsp;&nbsp;&nbsp; ![w:300 h:300](./assets/blog-qr.jpeg)
+
+---
+
+<!-- _class: lead -->
+# Effects and Side Effects
 
 ---
 
@@ -145,6 +149,11 @@ An **Effect System** is the implementation of the _Effect Pattern_
 * It provides structures to manage effects
 
 In an effect system, a side effect 👎 becomes an effect 👍
+
+---
+
+<!-- _class: lead -->
+# Scala Monadic Effect Systems
 
 ---
 
@@ -304,7 +313,12 @@ val partialResult: Result[String, String] < IO = Abort.run { drunkFlip }
   * For example, for testing purposes
 ---
 
-# Make Your Own Effects System 🛠️
+<!-- _class: lead -->
+# Build Your Own Effects System
+
+---
+
+# Build Your Own Effects System 🛠️
 
 * All the effect systems we've seen are based on _monads_ properties to _compose effectful functions_
   * They use _for-comprehension_ style to give an imperative flavor to a sequence of `flatMap` and `map` calls
@@ -571,6 +585,11 @@ val result: Try[Int] = IO.runBlocking { program }
 
 ---
 
+<!-- _class: lead -->
+# Adding Monadic Operations
+
+---
+
 # Bonus Track
 
 What if we can define `flatMap` and `map` in our Effect System 🤓?
@@ -624,6 +643,11 @@ If we substitute `inline` functions, we return to the version of `drunkFlip` tha
 
 ---
 
+<!-- _class: lead -->
+# Conclusions and References
+
+---
+
 # Conclusions
 
 * We defined what is a _side effect_ and why we don't like it
@@ -640,6 +664,9 @@ If we substitute `inline` functions, we return to the version of `drunkFlip` tha
 # So Long, and
 # Thanks for All the Fish 🐠!
 # 👋
+ 
+**YÆS**, _Yet Another Effect System_, 
+is a library implementing what we've seen today 😜
 
 ---
 
