@@ -98,7 +98,7 @@ def drunkFlip(): String = {
 
 # Side Effects
 
-* **Side Effect**: An unpredictable change in the state of the world
+* **Side Effect**: An _unpredictable change_ in the state of the world
   * *Unmanaged*, they just happen
 
 ```scala 3
