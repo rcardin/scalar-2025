@@ -116,7 +116,7 @@ def divide(a: Int, b: Int): Int = a / b
 When a side effect is _tracked_ and _controlled_ we call it an **effect**
   1. The _type_ of the function should tell us what effects it can perform and what's the type of the result
     - The `drunkFlip` deals with _non-determinism_ and _errors_
-  2. We must separe the _description_ from making it happen
+  2. We must separate the _description_ from making it happen
     - We want a _recipe_ of the program.
     - **Deferred execution** & **referential transparency**
 
@@ -145,7 +145,7 @@ val maybeString: Option[String] = maybeInt.map(_.toString)
 An **Effect System** is the implementation of the _Effect Pattern_
 
 * It puts side effects in a _box_
-* It replaces side effecting operation in standard libraries
+* It replaces side-effecting operations in standard libraries
 * It provides structures to manage effects
 
 In an effect system, a side effect 👎 becomes an effect 👍
@@ -160,17 +160,17 @@ In an effect system, a side effect 👎 becomes an effect 👍
 # Cats Effect
 
 * Cats Effect uses the `IO[A]` data type to model effects
-  * `IO[A]` is a _über effect_ that models any effectful computation that returns a value of type `A` and can fail with a `Throwable`
+  * `IO[A]` is an _über effect_ that models any effectful computation that returns a value of type `A` and can fail with a `Throwable`
   * It's a _monad_ so we must use `flatMap` and `map` to compose effectful functions
   * `IO[A]` is **referentially transparent** and **lazy** 
-  * Redefines the effectul part of the Standard Library
+  * Redefines the effectful part of the Standard Library
   * Implements _structured concurrency_
 
 ---
 
 # Cats Effect
 
-Let's rewrite the `drunkFlip` function using `IO` effect
+Let's rewrite the `drunkFlip` function using the `IO` effect
 
 ```scala 3
 def drunkFlip: IO[String] =
@@ -205,7 +205,7 @@ val resultF: Future[String] = drunkFlip.unsafeToFuture()
 
 # Cats Effect
 
-The `IO[A]` hides the exactly performed side effects. We can make them explicit using _Tagless Final_ syntax
+The `IO[A]` hides the exact side effects that were performed. We can make them explicit using _Tagless Final_ syntax
 
 ```scala 3
 def drunkFlipF[F[_]: Random: [G[_]] =>> MonadError[G, String]]: F[String] =
@@ -216,12 +216,12 @@ def drunkFlipF[F[_]: Random: [G[_]] =>> MonadError[G, String]]: F[String] =
       else ApplicativeError[F, String].raiseError("We dropped the coin")
   } yield if (heads) "Heads" else "Tails"
 ```
-The cognitive load is higher, here 😱
+The cognitive load is higher here 😱
 
 ___
 
 # ZIO
-* `ZIO[R, E, A]` introduces the errors type `E` and dependencies `R` in the effect definition
+* `ZIO[R, E, A]` introduces the error type `E` and dependencies `R` in the effect definition
   * It's still a monad on the `A` type (`map` and `flatMap`)
   * It provides a _rich algebra_ on the `ZIO` type to avoid monad transformers
   * It's a _referentially transparent_ and _lazy_ effect
@@ -232,7 +232,7 @@ ___
 
 # ZIO
 
-The `drunkFlip` function using `ZIO` effect is the following
+The `drunkFlip` function using `ZIO` effect is the following:
 
 ```scala 3
 def drunkFlip: ZIO[Random, String, String] =
@@ -244,7 +244,7 @@ def drunkFlip: ZIO[Random, String, String] =
   } yield if (heads) "Heads" else "Tails"
 ```
 
-**Effects are _explicit_** in the `R` type and we can fail with _custom errors_
+**Effects are _explicit_** in the `R` type, and we can fail with _custom errors_
 
 ---
 
@@ -262,13 +262,13 @@ object Main extends ZIOAppDefault {
 ```
 
 * We can use intersection type: `Random & Console`
-* We must fullfil _all the dependencies_ at once to run the effect
+* We must fulfill _all the dependencies_ at once to run the effect
 
 ---
 
 # Kyo: Meet Algebraic Effects
 
-What if we can have types _listing Effect separately_ and _handling_ them virtually _once at time_?
+What if we can have types _listing Effect separately_ and _handling_ them virtually _once at a time_?
 
 **Algebraic Effects and Handlers** do exactly that 🎉
  * The type of the function tells us exactly what effects it uses
@@ -309,7 +309,7 @@ val partialResult: Result[String, String] < IO = Abort.run { drunkFlip }
 * `Abort.run` is called an **Effect Handler**
   * It executes the `Abort` effect. The `IO` effect is _left untouched_
 
-* Virtually, we can define a our own effect handler without changing original recipe
+* Virtually, we can define our effect handler without changing the original recipe
   * For example, for testing purposes
 ---
 
@@ -364,7 +364,7 @@ ___
 
 # Access Std Library as an Effect
 
-We want to give tracked access to the side effect. Let's add some functions (a DSL) to our `object Random`
+We want to give tracked access to the side effects. Let's add some functions (a DSL) to our `object Random`
 
 ```scala 3
 object Random {
@@ -373,7 +373,7 @@ object Random {
 ```
 
 To generate a random `Boolean`, we need to _provide_ an instance of the `Random` effect. We can call it a **capability**
-* Calling `Random.nextBoolean` produces a _recipe_ of the program
+* Calling `Random.nextBoolean` produces a _recipe_ for the program
 
 ---
 
@@ -396,7 +396,7 @@ _Trivia_: The Scala `Console.println` object _doesn't throw any exceptions_ in c
 
 # Wrap It All Together
 
-We have now all th bricks to build the `drunkFlip` function again 🙌
+We have now all the bricks to build the `drunkFlip` function again 🙌
 
 ```scala 3
 def drunkFlip(using Random, Raise[String]): String = {
@@ -502,7 +502,7 @@ object Raise {
 
 # Handle the Effects
 
-Implementing the `Output` and `Random` handlers is quite easy
+Implementing the `Output` and `Random` handlers is relatively easy
 
 ```scala 3
 object Random {
@@ -573,7 +573,7 @@ object IO {
 * We can use Java Virtual Threads
   * Virtual Threads are implemented using _continuations_
   * They represent _fibers_ 🧶, or _green threads_ on the JVM
-  * From Java 24, they are safe also for `synchronized` blocks 🎉
+  * From Java 24, they are also safe for `synchronized` blocks 🎉
   * They support _structured concurrency_ 🤝
 
 ```scala 3
@@ -594,7 +594,7 @@ val result: Try[Int] = IO.runBlocking { program }
 
 What if we can define `flatMap` and `map` in our Effect System 🤓?
 
-We need to play some tricks. Let's define a class sorrounding an effect and implement the `flatMap` and `map` function on it
+We need to play some tricks. Let's define a class surrounding an effect and implement the `flatMap` and `map` functions on it
 
 ```scala 3
 final class Effect[F](val unsafe: F)
