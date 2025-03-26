@@ -2,7 +2,7 @@
 theme: gaia
 _class: lead
 paginate: true
-backgroundColor: #888
+backgroundColor: #fff
 backgroundImage: url('./assets/unicorn.jpg')
 author: Riccardo Cardin
 lang: en
@@ -42,7 +42,7 @@ Effect System in Scala Using Capability Passing Style
 # Who Am I?
 
 * Hello there 👋, I'm **Riccardo Cardin**, 
-  * An Enthusiastic Scala Lover 💯
+  * An Enthusiastic Scala Lover since 2011 💯
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![w:300 h:300](./assets/github-qr.jpeg)&nbsp;&nbsp;&nbsp;&nbsp;![w:300 h:300](./assets/linkedin-qr.jpeg)&nbsp;&nbsp;&nbsp; ![w:300 h:300](./assets/blog-qr.jpeg)
 
@@ -331,7 +331,9 @@ What if we could create an effect system that _doesn't rely on monads_, but almo
 
 # Model the Effects' Algebra 🛠️
 
-We'll focus on the `drunkFlip` example. We need effects that model non-determinism (`Random`), errors (`Raise`), and output (`Output`)
+We'll focus on the `drunkFlip` example. We need effects that model 
+✔️ non-determinism (`Random`), 
+✔️ errors (`Raise`)
 
 ```scala 3
 trait Random {
@@ -339,9 +341,6 @@ trait Random {
 }
 trait Raise[-E] { // <- `E` represents the error type
   def raise(error: => E): Nothing
-}
-trait Output {
-  def printLn(line: String): Unit
 }
 ```
 
@@ -354,7 +353,8 @@ We need now to wrap the standard library with the effects
 ```scala 3
 object Random {
   private val unsafe = new Random {
-    override def nextBoolean: Boolean = scala.util.Random.nextBoolean()
+    override def nextBoolean: Boolean = 
+      scala.util.Random.nextBoolean()
   }
 }
 ```
@@ -368,29 +368,12 @@ We want to give tracked access to the side effects. Let's add some functions (a 
 
 ```scala 3
 object Random {
-    def nextBoolean(using r: Random): Boolean = r.nextBoolean
+  def nextBoolean(using r: Random): Boolean = r.nextBoolean
 }
 ```
 
 To generate a random `Boolean`, we need to _provide_ an instance of the `Random` effect. We can call it a **capability**
 * Calling `Random.nextBoolean` produces a _recipe_ for the program
-
----
-
-# Access Std Library as an Effect
-
-Let's do the same for the `Ouptut` effect. We'll implement the `Raise[E]` effect later
-
-```scala 3
-object Output {
-  def printLn(line: String)(using o: Output): Unit = o.printLn(line)
-  val unsafe = new Output {
-    override def printLn(line: String): Unit = Console.println(line)
-  }
-}
-```
-
-_Trivia_: The Scala `Console.println` object _doesn't throw any exceptions_ in case of errors 🤷‍♂️
 
 ---
 
@@ -458,7 +441,7 @@ object Raise {
   def raise[E](error: => E)(using r: Raise[E]): Nothing = r.raise(error)
   def run[E, A](program: Raise[E] ?=> A): E | A =
     boundary {
-      given r: Raise[E] = new Raise[E] {
+      given unsafe: Raise[E] = new Raise[E] {
         override def raise(error: => E): Nothing = break(error)
       }
       program
@@ -474,7 +457,7 @@ object Raise {
   * We used the `boundary` and `break` functions to _control_ the effect
 
 ```scala 3
-val program: Random ?=> String = Raise.run { drunkFlip }
+val program: Random ?=> String | String = Raise.run { drunkFlip }
 ```
 
 * The `Raise.run` handler _runs_ the `Raise` effect, leaving the `Random` effect _untouched_ 🥷
@@ -502,17 +485,19 @@ object Raise {
 
 # Handle the Effects
 
-Implementing the `Output` and `Random` handlers is relatively easy
+Implementing the `Random` handler is relatively easy 👍
 
 ```scala 3
-object Random {
-  def run[A](program: Random ?=> A): A = program(using Random.unsafe)
-  // Omissis
-}
+def run[A](program: Random ?=> A): A = program(using Random.unsafe)
+```
 
-object Output {
-  def run[A](program: Output ?=> A): A = program(using Output.unsafe)
-  // Omissis
+We can even provide a test version of the `Random` effect
+
+```scala 3
+def test(fixed: Boolean)(program: Effect[Random] ?=> Boolean) = {
+  program(using new Random() {
+    override def nextBoolean: Boolean = fixed
+  })
 }
 ```
 
@@ -670,16 +655,23 @@ is a library implementing what we've seen today 😜
 
 ---
 
-# References
+<!-- _class: lead -->
 
-* [Essential Effects](https://essentialeffects.dev/), Adam Rosien
+## Final Thoughts?  
+🙋‍♂️ Happy to take questions !  
+
+---
+
+# References📚
+
+📚 [Essential Effects](https://essentialeffects.dev/), Adam Rosien
 * [Effect Oriented Programming](https://effectorientedprogramming.com/), Bill Frasure, Bruce Eckel, James Ward
 * [Zionomicon](https://www.zionomicon.com/), John A. De Goes, Adam Fraser, Milad Khajavi
 * [Effekt: Capability-passing style for type- and effect-safe, extensible effect handlers in Scala](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/effekt-capabilitypassing-style-for-type-and-effectsafe-extensible-effect-handlers-in-scala/A19680B18FB74AD95F8D83BC4B097D4F), Jonathan Brachthäuser , Philipp Schuster, Klaus Ostermann
 
 ---
 
-# References
+# References 📚
 
 * [Kyo](https://getkyo.io/), Streamlined Algebraic Effects, Simplified Functional Programming, Peak Scala Performance
 * [Scala 3 Context Functions](https://docs.scala-lang.org/scala3/reference/contextual/context-functions.html)
