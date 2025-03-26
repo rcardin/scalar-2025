@@ -664,7 +664,7 @@ is a library implementing what we've seen today 😜
 
 # References📚
 
-📚 [Essential Effects](https://essentialeffects.dev/), Adam Rosien
+* [Essential Effects](https://essentialeffects.dev/), Adam Rosien
 * [Effect Oriented Programming](https://effectorientedprogramming.com/), Bill Frasure, Bruce Eckel, James Ward
 * [Zionomicon](https://www.zionomicon.com/), John A. De Goes, Adam Fraser, Milad Khajavi
 * [Effekt: Capability-passing style for type- and effect-safe, extensible effect handlers in Scala](https://www.cambridge.org/core/journals/journal-of-functional-programming/article/effekt-capabilitypassing-style-for-type-and-effectsafe-extensible-effect-handlers-in-scala/A19680B18FB74AD95F8D83BC4B097D4F), Jonathan Brachthäuser , Philipp Schuster, Klaus Ostermann
