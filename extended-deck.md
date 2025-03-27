@@ -494,7 +494,7 @@ def run[A](program: Random ?=> A): A = program(using Random.unsafe)
 We can even provide a test version of the `Random` effect
 
 ```scala 3
-def test(fixed: Boolean)(program: Effect[Random] ?=> Boolean) = {
+def test(fixed: Boolean)(program: Random ?=> Boolean) = {
   program(using new Random() {
     override def nextBoolean: Boolean = fixed
   })
